@@ -1,0 +1,30 @@
+
+.wine-statistics-container {
+  margin: 20px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.wine-statistics-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.wine-statistics-table th,
+.wine-statistics-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.wine-statistics-table th {
+  background-color: #f2f2f2;
+}
+
+@media screen and (max-width: 600px) {
+  .table-responsive {
+    overflow-x: scroll;
+  }
+}
