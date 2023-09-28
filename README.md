@@ -45,6 +45,6 @@ You can learn more in the [Create React App documentation](https://facebook.gith
 
 To learn React, check out the [React documentation](https://reactjs.org/).
 
+OUTPUT:
 
-
-![Screenshot 2023-09-28 212803](https://github.com/GSAIPAVANKUMAR24/statistics/assets/130046978/494cee70-f7d0-4c78-b3be-ffa299256195)
+![Screenshot 2023-09-28 212803](https://github.com/GSAIPAVANKUMAR24/statistics/assets/130046978/dabbc40e-e737-44e4-bab7-fde07baf8789)
