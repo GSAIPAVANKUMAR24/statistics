@@ -11,61 +11,68 @@ interface ClassStatistics {
 
 const Flavanoids: React.FC = () => {
   const [statistics, setStatistics] = useState<ClassStatistics[]>([]);
+  const calculateStatistics = () => {
+    const classDataMap: { [key: number]: number[] } = {};
+    const newStatistics: ClassStatistics[] = [];
 
-  useEffect(() => {
-    const calculateStatistics = () => {
-      const uniqueClasses = Array.from(
-        new Set(wineData.map((wine) => wine.Alcohol))
+    // Collect Flavanoid values for each class
+    wineData.forEach((wine) => {
+      const classValue = wine.Alcohol;
+      const flavanoid = wine.Flavanoids;
+
+      if (!classDataMap[classValue]) {
+        classDataMap[classValue] = [];
+      }
+
+      classDataMap[classValue].push(flavanoid);
+    });
+
+    // Calculate statistics for each class
+    Object.entries(classDataMap).forEach(([classValue, flavanoidValues]) => {
+      const numericClassValue = parseFloat(classValue);
+      const mean = parseFloat(
+        (
+          flavanoidValues.reduce((sum, value) => sum + value, 0) /
+          flavanoidValues.length
+        ).toFixed(2)
       );
-      const newStatistics: ClassStatistics[] = [];
 
-      uniqueClasses.forEach((classValue) => {
-        const classData = wineData.filter(
-          (wine) => wine.Alcohol === classValue
-        );
-        const flavanoidsValues = classData.map((wine) => wine.Flavanoids);
+      const sortedValues = [...flavanoidValues].sort((a, b) => a - b);
+      const middle = Math.floor(sortedValues.length / 2);
+      const median =
+        sortedValues.length % 2 === 0
+          ? (sortedValues[middle - 1] + sortedValues[middle]) / 2
+          : sortedValues[middle];
 
-        // Calculate mean
-        const mean =
-          flavanoidsValues.reduce((sum, value) => sum + value, 0) /
-          flavanoidsValues.length;
-
-        // Calculate median
-        const sortedValues = [...flavanoidsValues].sort((a, b) => a - b);
-        const middle = Math.floor(sortedValues.length / 2);
-        const median =
-          sortedValues.length % 2 === 0
-            ? (sortedValues[middle - 1] + sortedValues[middle]) / 2
-            : sortedValues[middle];
-
-        // Calculate mode
-        const valueCounts: { [key: number]: number } = {};
-        flavanoidsValues.forEach((value) => {
-          valueCounts[value] = (valueCounts[value] || 0) + 1;
-        });
-
-        let modeValue: number | null = null;
-        let modeCount = 0;
-        for (const key in valueCounts) {
-          if (valueCounts[key] > modeCount) {
-            modeValue = parseFloat(key);
-            modeCount = valueCounts[key];
-          }
-        }
-
-        newStatistics.push({
-          class: classValue,
-          mean: parseFloat(mean.toFixed(2)),
-          median: parseFloat(median.toFixed(2)),
-          mode: modeValue,
-        });
+      const valueCounts: { [key: number]: number } = {};
+      flavanoidValues.forEach((value) => {
+        valueCounts[value] = (valueCounts[value] || 0) + 1;
       });
 
-      setStatistics(newStatistics);
-    };
+      let modeValue: number | null = null;
+      let modeCount = 0;
 
+      for (const key in valueCounts) {
+        if (valueCounts[key] > modeCount) {
+          modeValue = parseFloat(key);
+          modeCount = valueCounts[key];
+        }
+      }
+
+      newStatistics.push({
+        class: numericClassValue,
+        mean,
+        median,
+        mode: modeValue,
+      });
+    });
+
+    setStatistics(newStatistics);
+  };
+
+  useEffect(() => {
     calculateStatistics();
-  }, [wineData]);
+  }, []);
 
   return (
     <div className="wine-statistics-container">

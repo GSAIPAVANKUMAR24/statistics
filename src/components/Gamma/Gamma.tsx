@@ -17,18 +17,24 @@ const Gamma: React.FC<any> = () => {
     return { ...wine, Gamma: gamma };
   });
   const calculateStatistics = () => {
-    const uniqueClasses = Array.from(
-      new Set(wineDataWithGamma.map((wine) => wine.Alcohol))
-    );
+    const classDataMap: { [key: number]: number[] } = {};
     const newStatistics: ClassStatistics[] = [];
 
-    uniqueClasses.forEach((classValue) => {
-      const classData = wineDataWithGamma.filter(
-        (wine) => wine.Alcohol === classValue
-      );
-      const gammaValues = classData.map((wine) => wine.Gamma);
+    // Collect gamma values for each class
+    wineDataWithGamma.forEach((wine) => {
+      const classValue = wine.Alcohol;
+      const gamma = wine.Gamma;
 
-      // Calculate mean
+      if (!classDataMap[classValue]) {
+        classDataMap[classValue] = [];
+      }
+
+      classDataMap[classValue].push(gamma);
+    });
+
+    // Calculate statistics for each class
+    Object.entries(classDataMap).forEach(([classValue, gammaValues]) => {
+      const numericClassValue = parseFloat(classValue);
       const mean = parseFloat(
         (
           gammaValues.reduce((sum, value) => sum + value, 0) /
@@ -36,7 +42,6 @@ const Gamma: React.FC<any> = () => {
         ).toFixed(3)
       );
 
-      // Calculate median
       const sortedValues = [...gammaValues].sort((a, b) => a - b);
       const middle = Math.floor(sortedValues.length / 2);
       const median =
@@ -46,7 +51,6 @@ const Gamma: React.FC<any> = () => {
             )
           : parseFloat(sortedValues[middle].toFixed(3));
 
-      // Calculate mode
       const valueCounts: { [key: number]: number } = {};
       gammaValues.forEach((value) => {
         valueCounts[value] = (valueCounts[value] || 0) + 1;
@@ -54,6 +58,7 @@ const Gamma: React.FC<any> = () => {
 
       let modeValue: number | null = null;
       let modeCount = 0;
+
       for (const key in valueCounts) {
         if (valueCounts[key] > modeCount) {
           modeValue = parseFloat(key);
@@ -62,7 +67,7 @@ const Gamma: React.FC<any> = () => {
       }
 
       newStatistics.push({
-        class: classValue,
+        class: numericClassValue,
         mean,
         median,
         mode: modeValue,
@@ -71,9 +76,10 @@ const Gamma: React.FC<any> = () => {
 
     setStatistics(newStatistics);
   };
+
   useEffect(() => {
     calculateStatistics();
-  }, [wineData]);
+  }, []);
 
   return (
     <div className="wine-statistics-container">
